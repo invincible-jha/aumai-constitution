@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]
@@ -36,7 +36,7 @@ class ConstitutionBuilder:
             constitution_id=str(uuid.uuid4()),
             name=name,
             author=author,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(tz=timezone.utc),
         )
 
     def add_principle(self, constitution: Constitution, principle: Principle) -> None:
@@ -138,11 +138,11 @@ class ComplianceChecker:
 
         if rule.lower().startswith("forbid:") or rule.lower().startswith("deny:"):
             pattern = re.split(":", rule, maxsplit=1)[1].strip()
-            return not bool(re.search(pattern, output, re.IGNORECASE))
+            return pattern.lower() not in output.lower()
 
         if rule.lower().startswith("require:") or rule.lower().startswith("must:"):
             pattern = re.split(":", rule, maxsplit=1)[1].strip()
-            return bool(re.search(pattern, output, re.IGNORECASE))
+            return pattern.lower() in output.lower()
 
         # Default: treat the rule as a forbidden keyword or phrase.
         return rule.lower() not in output_lower

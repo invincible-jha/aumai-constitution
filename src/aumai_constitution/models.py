@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -42,7 +42,7 @@ class Constitution(BaseModel):
     version: str = "1.0.0"
     principles: list[Principle] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     author: str
 
 
